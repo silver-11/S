@@ -46,26 +46,15 @@ export const extractEvidence = async (formData) => {
   return response.data;
 };
 
-// Function to sample frames from a segment
-const sampleFrames = (segment, interval) => {
-  // Placeholder implementation: sample frames every 'interval' seconds
-  const frames = [];
-  // Logic to sample frames based on segment data
-  return frames;
-};
+// Remove or comment out unused functions
+// const sampleFrames = async (videoFile) => {
+//   // ... existing code ...
+// };
 
-// Function to run YOLO object detection on frames
-const runYOLODetection = async (frames) => {
-  // Placeholder implementation: run YOLO on frames
-  const detectedObjects = [];
-  // Logic to run YOLO and return detected objects
-  return detectedObjects;
-};
+// const runYOLODetection = async (videoFile) => {
+//   // ... existing code ...
+// };
 
-// Function to pass detected objects to Gemini for evidence extraction
-const passToGemini = async (detectedObjects) => {
-  // Placeholder implementation: process objects with Gemini
-  const evidenceResult = "Evidence extraction result from Gemini";
-  // Logic to process objects and return evidence
-  return evidenceResult;
-}; 
+// const passToGemini = async (videoFile) => {
+//   // ... existing code ...
+// }; 

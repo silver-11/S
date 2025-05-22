@@ -4,7 +4,19 @@ import { useNavigate } from 'react-router-dom';
 import * as videoService from '../services/videoService';
 import { useAuth } from '../contexts/AuthContext';
 import './VideoAnalysisPage.css';
-import { Box, Typography, Card, CircularProgress, Button, Alert, Container, Paper, Grid } from '@mui/material';
+import { 
+  Box, 
+  Button, 
+  Typography, 
+  CircularProgress,
+  TextField,
+  Card,
+  CardContent,
+  Divider,
+  List,
+  ListItem,
+  ListItemText
+} from '@mui/material';
 
 function VideoAnalysisPage() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -236,6 +248,27 @@ function VideoAnalysisPage() {
     }
     return () => clearInterval(intervalId);
   }, [isExtractingEvidence]);
+
+  useEffect(() => {
+    if (classificationMessages.length > 0) {
+      const lastMessage = classificationMessages[classificationMessages.length - 1];
+      setDisplayedClassification(lastMessage);
+    }
+  }, [classificationMessages]);
+
+  useEffect(() => {
+    if (captioningMessages.length > 0) {
+      const lastMessage = captioningMessages[captioningMessages.length - 1];
+      setDisplayedCaption(lastMessage);
+    }
+  }, [captioningMessages]);
+
+  useEffect(() => {
+    if (evidenceMessages.length > 0) {
+      const lastMessage = evidenceMessages[evidenceMessages.length - 1];
+      setDisplayedEvidence(lastMessage);
+    }
+  }, [evidenceMessages]);
 
   return (
     <div className="video-analysis-page">
