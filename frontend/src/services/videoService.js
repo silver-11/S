@@ -1,0 +1,71 @@
+// This file will contain functions for video processing API calls (upload, caption, progress)
+import axios from 'axios';
+
+const API_URL = '/api'; // Proxied by react-scripts dev server
+
+export const uploadVideoForClassification = async (formData) => {
+  // formData should contain the video file under the key 'video'
+  const response = await axios.post(`${API_URL}/upload`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+    withCredentials: true
+  });
+  return response.data; // Expects { success: true, data: { possible_scenes: [], text_color: '' } } or error
+};
+
+export const uploadVideoForCaptioning = async (formData) => {
+  // formData should contain the video file under the key 'video'
+  const response = await axios.post(`${API_URL}/caption`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+    withCredentials: true
+  });
+  return response.data; // Expects { success: true, data: { caption: '' } } or error
+};
+
+export const getCaptionProgress = async () => {
+  // This route might not be fully utilized yet based on current backend
+  try {
+    const response = await axios.get(`${API_URL}/caption_progress`);
+    return response.data; // Expects { status: '', progress: 0, message: '' }
+  } catch (error) {
+    console.error("Error fetching caption progress:", error);
+    return { status: 'error', progress: 0, message: 'Could not fetch progress.' };
+  }
+};
+
+export const extractEvidence = async (formData) => {
+  const response = await axios.post(`${API_URL}/extract-evidence`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+    withCredentials: true
+  });
+  return response.data;
+};
+
+// Function to sample frames from a segment
+const sampleFrames = (segment, interval) => {
+  // Placeholder implementation: sample frames every 'interval' seconds
+  const frames = [];
+  // Logic to sample frames based on segment data
+  return frames;
+};
+
+// Function to run YOLO object detection on frames
+const runYOLODetection = async (frames) => {
+  // Placeholder implementation: run YOLO on frames
+  const detectedObjects = [];
+  // Logic to run YOLO and return detected objects
+  return detectedObjects;
+};
+
+// Function to pass detected objects to Gemini for evidence extraction
+const passToGemini = async (detectedObjects) => {
+  // Placeholder implementation: process objects with Gemini
+  const evidenceResult = "Evidence extraction result from Gemini";
+  // Logic to process objects and return evidence
+  return evidenceResult;
+}; 
