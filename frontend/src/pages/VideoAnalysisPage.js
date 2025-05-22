@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import * as videoService from '../services/videoService';
@@ -36,30 +36,28 @@ function VideoAnalysisPage() {
   const [evidenceLoadingMessage, setEvidenceLoadingMessage] = useState('');
   const evidenceResultsRef = useRef(null);
 
-  const { } = useAuth();
-
-  const classificationMessages = [
+  const classificationMessages = useMemo(() => [
     "UPLOADING AND PREPARING VIDEO...",
     "STAGE 1: DETECTING POTENTIAL CRIME FRAMES (CLIP)...",
     "STAGE 2: IDENTIFYING EVENT SEGMENTS...",
     "STAGE 3: CLASSIFYING SEGMENT CRIME TYPES (TIMESFORMER)...",
     "COMPILING FINAL REPORT..."
-  ];
+  ], []);
 
-  const captioningMessages = [
+  const captioningMessages = useMemo(() => [
     "CONNECTING TO NARRATIVE AI...",
     "UPLOADING VIDEO CONTEXT...",
     "AI IS COMPOSING DESCRIPTION...",
     "FETCHING GENERATED CAPTION..."
-  ];
+  ], []);
 
-  const evidenceMessages = [
+  const evidenceMessages = useMemo(() => [
     "UPLOADING VIDEO...",
     "STAGE 1: EXTRACTING FRAMES...",
     "STAGE 2: RUNNING OBJECT DETECTION...",
     "STAGE 3: ANALYZING SUSPICIOUS OBJECTS...",
     "STAGE 4: GENERATING EVIDENCE REPORT..."
-  ];
+  ], []);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
