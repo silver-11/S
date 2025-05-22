@@ -21,7 +21,11 @@ from video_routes import video_bp
 
 # Initialize Flask App
 app = Flask(__name__, static_folder='frontend/build', static_url_path='/')
-CORS(app, supports_credentials=True) # Enable CORS for all routes, allowing credentials
+CORS(app, 
+     resources={r"/api/*": {"origins": ["https://scene-solver.vercel.app", "http://localhost:3000"]}},
+     supports_credentials=True,
+     allow_headers=["Content-Type", "Authorization"],
+     methods=["GET", "POST", "OPTIONS"])
 
 # Apply configurations from config.py
 app.config['MAX_CONTENT_LENGTH'] = config.MAX_CONTENT_LENGTH
