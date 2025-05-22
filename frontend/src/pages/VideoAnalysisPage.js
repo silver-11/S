@@ -1,21 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import * as videoService from '../services/videoService';
-import { useAuth } from '../contexts/AuthContext';
 import './VideoAnalysisPage.css';
 import { 
   Box, 
-  Button, 
-  Typography, 
-  CircularProgress,
-  TextField,
-  Card,
-  CardContent,
-  Divider,
-  List,
-  ListItem,
-  ListItemText
+  Typography
 } from '@mui/material';
 
 function VideoAnalysisPage() {
