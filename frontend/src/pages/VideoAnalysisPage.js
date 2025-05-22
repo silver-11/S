@@ -33,11 +33,10 @@ function VideoAnalysisPage() {
   const [evidenceExtractionResult, setEvidenceExtractionResult] = useState(null);
   const [isExtractingEvidence, setIsExtractingEvidence] = useState(false);
   const [evidenceError, setEvidenceError] = useState('');
-  const [frameImageUrl, setFrameImageUrl] = useState(null);
   const [evidenceLoadingMessage, setEvidenceLoadingMessage] = useState('');
   const evidenceResultsRef = useRef(null);
 
-  const { currentUser } = useAuth();
+  const { } = useAuth();
 
   const classificationMessages = [
     "UPLOADING AND PREPARING VIDEO...",
@@ -78,7 +77,6 @@ function VideoAnalysisPage() {
       setCaptionError('');
       setEvidenceExtractionResult(null);
       setEvidenceError('');
-      setFrameImageUrl(null);
       setDisplayedCaption('');
     } else {
       setSelectedFile(null);
@@ -151,7 +149,6 @@ function VideoAnalysisPage() {
     setIsExtractingEvidence(true);
     setEvidenceError('');
     setEvidenceExtractionResult(null);
-    setFrameImageUrl(null);
     
     const formData = new FormData();
     formData.append('video', selectedFile);
@@ -217,7 +214,7 @@ function VideoAnalysisPage() {
       setClassificationLoadingMessage('');
     }
     return () => clearInterval(intervalId);
-  }, [isClassifying]);
+  }, [isClassifying, classificationMessages]);
 
   useEffect(() => {
     let intervalId;
@@ -232,7 +229,7 @@ function VideoAnalysisPage() {
       setCaptioningLoadingMessage('');
     }
     return () => clearInterval(intervalId);
-  }, [isCaptioning]);
+  }, [isCaptioning, captioningMessages]);
 
   useEffect(() => {
     let intervalId;
@@ -247,28 +244,7 @@ function VideoAnalysisPage() {
       setEvidenceLoadingMessage('');
     }
     return () => clearInterval(intervalId);
-  }, [isExtractingEvidence]);
-
-  useEffect(() => {
-    if (classificationMessages.length > 0) {
-      const lastMessage = classificationMessages[classificationMessages.length - 1];
-      setDisplayedClassification(lastMessage);
-    }
-  }, [classificationMessages]);
-
-  useEffect(() => {
-    if (captioningMessages.length > 0) {
-      const lastMessage = captioningMessages[captioningMessages.length - 1];
-      setDisplayedCaption(lastMessage);
-    }
-  }, [captioningMessages]);
-
-  useEffect(() => {
-    if (evidenceMessages.length > 0) {
-      const lastMessage = evidenceMessages[evidenceMessages.length - 1];
-      setDisplayedEvidence(lastMessage);
-    }
-  }, [evidenceMessages]);
+  }, [isExtractingEvidence, evidenceMessages]);
 
   return (
     <div className="video-analysis-page">
