@@ -158,15 +158,6 @@ function VideoAnalysisPage() {
       if (response.success) {
         setEvidenceExtractionResult(response.data);
         
-        const lines = response.data.split('\n');
-        for (const line of lines) {
-          if (line.includes('Frame saved as:')) {
-            const framePath = line.split('Frame saved as:')[1].trim();
-            setFrameImageUrl(`http://127.0.0.1:5000/inferred_frames/${framePath}`);
-            break;
-          }
-        }
-
         setTimeout(() => {
           if (evidenceResultsRef.current) {
             evidenceResultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
