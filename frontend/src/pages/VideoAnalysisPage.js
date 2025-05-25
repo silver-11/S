@@ -6,6 +6,8 @@ import {
   Typography
 } from '@mui/material';
 
+const API_URL = `${process.env.REACT_APP_API_URL}` || 'https://3ed0-103-88-237-251.ngrok-free.app'; 
+
 function VideoAnalysisPage() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -108,8 +110,10 @@ function VideoAnalysisPage() {
 
     try {
       const response = await videoService.uploadVideoForCaptioning(formData);
-      if (response.success) {
-        setCaptionResult(response.data);
+      if (response.success && response.data && response.data.caption) {
+        setCaptionResult({
+          caption: response.data.caption
+        });
         // Scroll to caption results after a short delay
         setTimeout(() => {
           const captionElement = document.querySelector('.caption-results');
@@ -118,13 +122,14 @@ function VideoAnalysisPage() {
           }
         }, 100);
       } else {
-        setCaptionError(response.message || 'Captioning failed.');
+        setCaptionError(response.message || 'Captioning failed. Please try again.');
       }
     } catch (error) {
-      setCaptionError(error.message || 'An unexpected error occurred during captioning.');
       console.error("Captioning error:", error);
+      setCaptionError(error.message || 'An unexpected error occurred during captioning.');
+    } finally {
+      setIsCaptioning(false);
     }
-    setIsCaptioning(false);
   };
 
   const handleExtractEvidence = async () => {
@@ -309,8 +314,10 @@ function VideoAnalysisPage() {
                           {segment.representative_frames.map((frame, frameIndex) => (
                             <img
                               key={frameIndex}
-                              src={`http://127.0.0.1:5000/inferred_frames/${frame.saved_frame_path}`}
+                              src={`${API_URL}/inferred_frames/${frame.saved_frame_path}`}
+                              
                               alt={`Representative frame ${frameIndex + 1} for segment ${index + 1}`}
+                              crossOrigin="anonymous"  // <--- Add this
                               style={{ maxHeight: '400px', maxWidth: '400px', border: '1px solid #ddd', borderRadius: '4px' }}
                             />
                           ))}
@@ -342,9 +349,12 @@ function VideoAnalysisPage() {
                     return (
                       <div key={index} className="best-frame-wrapper">
                         <img 
-                          src={`http://127.0.0.1:5000/inferred_frames/${fullPath}`}
+                          src={`http://localhost:5000/proxy_inferred_frame/${fullPath}`}
+
+                          //src={`${API_URL}/inferred_frames/${fullPath}`} 
                           alt="Frame with most detections"
                           className="best-frame-image"
+                          crossOrigin="anonymous"  // <--- Add this
                           onError={(e) => {
                             console.error("Best frame image failed to load:", e);
                             e.target.style.display = 'none';
@@ -374,9 +384,10 @@ function VideoAnalysisPage() {
                       return (
                         <div key={index} className="suspicious-frame-item">
                           <img 
-                            src={`http://127.0.0.1:5000/inferred_frames/${fullPath}`}
+                            src={`${API_URL}/inferred_frames/${fullPath}`}
                             alt="Frame with suspicious objects"
                             className="suspicious-frame-image"
+                            crossOrigin="anonymous"  // <--- Add this
                             onError={(e) => {
                               console.error("Suspicious frame image failed to load:", e);
                               e.target.style.display = 'none';
@@ -438,4 +449,4 @@ function VideoAnalysisPage() {
   );
 }
 
-export default VideoAnalysisPage; 
+export default VideoAnalysisPage;
