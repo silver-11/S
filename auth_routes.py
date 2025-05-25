@@ -21,7 +21,18 @@ def login():
         user_info = db.get_user_info(user_id)
         
         response = make_response(jsonify({"success": True, "message": "Login successful", "user": user_info}))
-        response.set_cookie('session_token', session_token, httponly=True, samesite='Lax', max_age=86400) # 24 hours
+        # response.set_cookie('session_token', session_token, httponly=True, samesite='Lax', max_age=86400) # 24 hours
+        response.set_cookie(
+            'session_token',
+            session_token,
+            httponly=True,
+            samesite='None',
+            max_age=86400,
+            secure=True,  # ngrok is HTTPS
+            
+        )
+        print(response.headers)
+
         return response
     else:
         return jsonify({"success": False, "message": message}), 401

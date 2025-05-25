@@ -40,7 +40,7 @@ const Layout = () => {
       <nav className="navbar">
         <div className="navbar-logo">
           {/* <img src={logoImage} alt="SceneSolver Logo" style={{ height: '40px', marginRight: '10px' }} /> */}
-          <Link to="/">SceneSolver</Link> {/* Placeholder text, can be replaced/enhanced by logo */}
+          <Link to="/">🔎</Link> {/* Placeholder text, can be replaced/enhanced by logo */}
         </div>
         <div className="navbar-links">
           <ul>

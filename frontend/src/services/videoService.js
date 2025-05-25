@@ -1,7 +1,9 @@
 // This file will contain functions for video processing API calls (upload, caption, progress)
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://scene-solver.onrender.com/api'; // Use environment variable or default to Render URL
+//const API_URL = process.env.REACT_APP_API_URL || 'https://scene-solver.onrender.com/api'; // Use environment variable or default to Render URL
+
+const API_URL =`${process.env.REACT_APP_API_URL}/api` || 'https://3ed0-103-88-237-251.ngrok-free.app/api'; // Use environment variable or default to localhost
 
 export const uploadVideoForClassification = async (formData) => {
   // formData should contain the video file under the key 'video'

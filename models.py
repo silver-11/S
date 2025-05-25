@@ -90,46 +90,43 @@ class CLIPClassifier(nn.Module):
 
 def load_clip_classification_model():
     global clip_processor_global, clip_model_global, custom_clip_classifier_model_global
-    # LABELS_MAP, IDX_TO_LABEL_MAP, NUM_CLASSES are imported from config
     try:
-        print(f"Initializing CLIP model on device: {DEVICE}")
+        print(f"\n=== Loading CLIP Model ===")
+        print(f"Device: {DEVICE}")
+        print(f"Checkpoint path: {FULL_CHECKPOINT_PATH}")
+        print(f"Checkpoint exists: {os.path.exists(FULL_CHECKPOINT_PATH)}")
+        
+        print("Loading CLIP processor and base model...")
         clip_processor_global = CLIPProcessor.from_pretrained(CLIP_MODEL_NAME)
         clip_model_global = CLIPModel.from_pretrained(CLIP_MODEL_NAME).to(DEVICE)
         clip_model_global.eval()
 
-        print(f"Using labels for {NUM_CLASSES} classes: {LABELS_MAP}")
-        if NUM_CLASSES == 0:
-            print("CRITICAL ERROR: No classes defined for CLIP model (NUM_CLASSES is 0 in config). Cannot proceed.")
-            return
-
+        print(f"Initializing classifier for {NUM_CLASSES} classes")
         custom_clip_classifier_model_global = CLIPClassifier(NUM_CLASSES, LABELS_MAP, clip_model_global)
 
-        print(f"Loading CLIP classifier checkpoint from {FULL_CHECKPOINT_PATH}")
-        if not os.path.exists(FULL_CHECKPOINT_PATH):
-            print(f"CRITICAL ERROR: CLIP Model checkpoint NOT FOUND at {FULL_CHECKPOINT_PATH}")
-            print(f"Please ensure '{MODEL_TO_LOAD_FILENAME}' is in '{MODEL_CHECKPOINT_DIR}'")
-            custom_clip_classifier_model_global = None
-            return
-
+        print("Loading checkpoint...")
         checkpoint = torch.load(FULL_CHECKPOINT_PATH, map_location=DEVICE)
+        print(f"Checkpoint keys: {checkpoint.keys() if isinstance(checkpoint, dict) else 'Not a dict'}")
+        
         if isinstance(checkpoint, dict) and 'model_state_dict' in checkpoint:
             custom_clip_classifier_model_global.load_state_dict(checkpoint['model_state_dict'])
-            print("Loaded CLIP classifier from checkpoint's 'model_state_dict'.")
-            if 'epoch' in checkpoint: print(f"Checkpoint epoch: {checkpoint['epoch']}")
-            if 'val_accuracy' in checkpoint: print(f"Checkpoint val_accuracy: {checkpoint['val_accuracy']:.2f}%")
+            print("Loaded from model_state_dict")
         elif isinstance(checkpoint, dict) and 'classifier_state_dict' in checkpoint:
             custom_clip_classifier_model_global.classifier.load_state_dict(checkpoint['classifier_state_dict'])
-            print("Loaded CLIP classifier head from checkpoint's 'classifier_state_dict'.")
+            print("Loaded from classifier_state_dict")
         else:
             custom_clip_classifier_model_global.load_state_dict(checkpoint)
-            print("Loaded CLIP classifier from raw checkpoint (assumed to be state_dict).")
+            print("Loaded from raw checkpoint")
 
         custom_clip_classifier_model_global.eval()
-        print("CLIP Classification model loaded successfully.")
+        print("CLIP model loaded successfully!")
+        print("========================\n")
 
     except Exception as e:
-        print(f"CRITICAL: Failed to load CLIP classification model: {str(e)}")
+        print(f"\n!!! ERROR loading CLIP model !!!")
+        print(f"Error: {str(e)}")
         traceback.print_exc()
+        print("========================\n")
         custom_clip_classifier_model_global = None
 
 def load_gemini_model():
@@ -169,71 +166,47 @@ def get_gemini_model():
 def load_timesformer_model():
     global timesformer_model_global
     try:
-        print(f"Initializing Timesformer model on device: {DEVICE}")
+        print(f"\n=== Loading Timesformer Model ===")
+        print(f"Device: {DEVICE}")
         
-        # Use a base model name from Hugging Face, config will be adjusted
-        base_timesformer_model_name = "facebook/timesformer-base-finetuned-k400" 
+        timesformer_checkpoint_path = os.path.join(MODEL_CHECKPOINT_DIR, TIMESFORMER_MODEL_FILENAME)
+        print(f"Checkpoint path: {timesformer_checkpoint_path}")
+        print(f"Checkpoint exists: {os.path.exists(timesformer_checkpoint_path)}")
+        
+        print("Loading base Timesformer model...")
+        base_timesformer_model_name = "facebook/timesformer-base-finetuned-k400"
         config = TimesformerConfig.from_pretrained(base_timesformer_model_name)
         
         num_timesformer_classes = len(TIMESFORMER_LABELS_MAP)
         config.num_labels = num_timesformer_classes
-        config.model_type = 'timesformer' # Ensure model type is set
+        print(f"Configured for {num_timesformer_classes} classes")
         
-        print(f"Timesformer configured for {num_timesformer_classes} classes: {TIMESFORMER_LABELS_MAP}")
-
         timesformer_model_global = TimesformerForVideoClassification.from_pretrained(
             base_timesformer_model_name,
             config=config,
-            ignore_mismatched_sizes=True # Important if classifier head size differs
+            ignore_mismatched_sizes=True
         )
         
-        # Replace the classifier head to match our number of classes
-        timesformer_model_global.classifier = nn.Linear(config.hidden_size, num_timesformer_classes)
-        
-        # Construct full path to the local checkpoint
-        timesformer_checkpoint_path = os.path.join(MODEL_CHECKPOINT_DIR, TIMESFORMER_MODEL_FILENAME)
-        print(f"Loading Timesformer checkpoint from {timesformer_checkpoint_path}")
-
-        if not os.path.exists(timesformer_checkpoint_path):
-            print(f"CRITICAL ERROR: Timesformer Model checkpoint NOT FOUND at {timesformer_checkpoint_path}")
-            timesformer_model_global = None
-            return
-
+        print("Loading checkpoint...")
         checkpoint = torch.load(timesformer_checkpoint_path, map_location=DEVICE)
+        print(f"Checkpoint keys: {checkpoint.keys() if isinstance(checkpoint, dict) else 'Not a dict'}")
         
-        # Handle different checkpoint structures (similar to f1.py's loading)
         if isinstance(checkpoint, dict) and 'model_state_dict' in checkpoint:
+            print("Loading from model_state_dict...")
             timesformer_model_global.load_state_dict(checkpoint['model_state_dict'])
-            print("Loaded Timesformer from checkpoint's 'model_state_dict'.")
-        elif isinstance(checkpoint, dict) and 'state_dict' in checkpoint: # Common in PyTorch Lightning
-             timesformer_model_global.load_state_dict(checkpoint['state_dict'])
-             print("Loaded Timesformer from checkpoint's 'state_dict'.")
         else:
-            # Try loading directly, assuming the checkpoint is the state_dict
-            try:
-                timesformer_model_global.load_state_dict(checkpoint)
-                print("Loaded Timesformer from raw checkpoint (assumed to be state_dict).")
-            except RuntimeError as e:
-                print(f"Error loading Timesformer state_dict directly: {e}. Attempting with strict=False...")
-                try:
-                    load_output = timesformer_model_global.load_state_dict(checkpoint.get('model_state_dict', checkpoint), strict=False)
-                    print(f"Timesformer loaded with strict=False. Missing keys: {load_output.missing_keys}, Unexpected keys: {load_output.unexpected_keys}")
-                    if load_output.missing_keys and any('classifier' in k for k in load_output.missing_keys):
-                        print("WARNING: Timesformer classifier weights might be missing after strict=False load!")
-                except Exception as e2:
-                    print(f"CRITICAL: Failed to load Timesformer model even with strict=False: {str(e2)}")
-                    traceback.print_exc()
-                    timesformer_model_global = None
-                    return
-
-
-        timesformer_model_global.to(DEVICE)
+            print("Loading from raw checkpoint...")
+            timesformer_model_global.load_state_dict(checkpoint)
+            
         timesformer_model_global.eval()
-        print("Timesformer model loaded successfully WITH custom checkpoint.")
+        print("Timesformer model loaded successfully!")
+        print("========================\n")
 
     except Exception as e:
-        print(f"CRITICAL: Failed to load Timesformer model: {str(e)}")
+        print(f"\n!!! ERROR loading Timesformer model !!!")
+        print(f"Error: {str(e)}")
         traceback.print_exc()
+        print("========================\n")
         timesformer_model_global = None
 
 def get_timesformer_model():

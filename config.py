@@ -8,7 +8,7 @@ SECRET_KEY = os.urandom(24) # For Flask app.secret_key
 
 # --- Configuration for CLIP Model ---
 MAIN_PROJECT_ROOT = "." 
-MODEL_CHECKPOINT_DIR = MAIN_PROJECT_ROOT # Assuming best_model_epoch_18.pth is in the root
+MODEL_CHECKPOINT_DIR = os.path.join(MAIN_PROJECT_ROOT, "model_checkpoints")  # Updated to use model_checkpoints directory
 MODEL_TO_LOAD_FILENAME = "best_model_epoch_18.pth"
 FULL_CHECKPOINT_PATH = os.path.join(MODEL_CHECKPOINT_DIR, MODEL_TO_LOAD_FILENAME)
 

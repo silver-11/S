@@ -1,7 +1,7 @@
 // This file will contain functions for authentication-related API calls (login, signup, logout, me)
 import axios from 'axios';
 
-const API_URL = '/api'; // Proxied by react-scripts dev server
+const API_URL =`${process.env.REACT_APP_API_URL}/api` || 'https://3ed0-103-88-237-251.ngrok-free.app/api'; // Proxied by react-scripts dev server
 
 export const login = async (username, password) => {
   const params = new URLSearchParams();

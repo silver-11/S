@@ -14,6 +14,7 @@
 }
 
 .navbar {
+  font-family: 'Press Start 2P', cursive; /* Pixel font for nav links */
   background-color: #000000; /* Pure black for navbar */
   padding: 0.8rem 1.5rem; /* Slightly adjusted padding */
   color: #e0e0e0;
